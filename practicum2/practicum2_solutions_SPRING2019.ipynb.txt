@@ -1,0 +1,1879 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<a id='top'></a>\n",
+    "\n",
+    "# CSCI 3022: Intro to Data Science - Spring 2019 Practicum 2\n",
+    "***\n",
+    "\n",
+    "This practicum is due on Canvas by **11:59 PM on Friday May 3**. Your solutions to theoretical questions should be done in Markdown/MathJax directly below the associated question.  Your solutions to computational questions should include any specified Python code and results as well as written commentary on your conclusions.  \n",
+    "\n",
+    "**Here are the rules:** \n",
+    "\n",
+    "1. All work, code and analysis, must be your own. \n",
+    "1. You may use your course notes, posted lecture slides, textbooks, in-class notebooks, and homework solutions as resources.  You may also search online for answers to general knowledge questions like the form of a probability distribution function or how to perform a particular operation in Python/Pandas. \n",
+    "1. This is meant to be like a coding portion of your midterm exam. So, the instructional team will be much less helpful than we typically are with homework. For example, we will not check answers, help debug your code, and so on.\n",
+    "1. If something is left open-ended, it is because we want to see how you approach the kinds of problems you will encounter in the wild, where it will not always be clear what sort of tests/methods should be applied. Feel free to ask clarifying questions though.\n",
+    "2. You may **NOT** post to message boards or other online resources asking for help.\n",
+    "3. You may **NOT** copy-paste solutions *from anywhere*.\n",
+    "4. You may **NOT** collaborate with classmates or anyone else.\n",
+    "5. In short, **your work must be your own**. It really is that simple.\n",
+    "\n",
+    "Violation of the above rules will result in an immediate academic sanction (*at the very least*, you will receive a 0 on this practicum or an F in the course, depending on severity), and a trip to the Honor Code Council.\n",
+    "\n",
+    "**By submitting this assignment, you agree to abide by the rules given above.**\n",
+    "\n",
+    "***\n",
+    "\n",
+    "**Name**:  \n",
+    "\n",
+    "***\n",
+    "\n",
+    "\n",
+    "**NOTES**: \n",
+    "\n",
+    "- You may not use late days on the practicums nor can you drop your practicum grades. \n",
+    "- If you have a question for us, post it as a **PRIVATE** message on Piazza.  If we decide that the question is appropriate for the entire class, then we will add it to a Practicum clarifications thread. \n",
+    "- Do **NOT** load or use any Python packages that are not available in Anaconda 3.6. \n",
+    "- Some problems with code may be autograded.  If we provide a function API **do not** change it.  If we do not provide a function API then you're free to structure your code however you like. \n",
+    "- Submit only this Jupyter notebook to Canvas.  Do not compress it using tar, rar, zip, etc. \n",
+    "- This should go without saying, but... For any question that asks you to calculate something, you **must show all work to receive credit**. Sparse or nonexistent work will receive sparse or nonexistent credit.\n",
+    "\n",
+    "---\n",
+    "**Shortcuts:**  [Problem 1](#p1) | [Problem 2](#p2) | [Bottom](#bot)\n",
+    "\n",
+    "---"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 445,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "# import whatever packages you think you will need here!\n",
+    "\n",
+    "# SOLUTION:\n",
+    "from scipy import stats\n",
+    "from math import isnan\n",
+    "import numpy as np \n",
+    "import statsmodels.api as sm\n",
+    "import pandas as pd\n",
+    "import matplotlib.pyplot as plt\n",
+    "%matplotlib inline"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<br>\n",
+    "\n",
+    "---\n",
+    "<a id='p1'></a>\n",
+    "[Back to top](#top)\n",
+    "\n",
+    "### [30 points] Problem 1:  What's the best Oreo flavor?\n",
+    "\n",
+    "> <img src=\"https://media2.s-nbcnews.com/j/newscms/2015_52/1351976/151223-watermelon-oreos-flickr-yh-1234p_a4c4ba1016261e5d799a789666948a6e.fit-760w.jpg\" style=\"width: 400px;\"/>\n",
+    "**Figure 1.** Watermelon Oreos. These are undeniably the absolute _worst_ Oreo flavor, but not a part of our data set. If they were, the problem would be too easy.\n",
+    "\n",
+    "You're skipping down the road one day, singing a merry tune without a care in the world. Every so often you hop and click your heels together. After one such hop, though, you stumble and nearly trip. Under your feet is a fun data set!\n",
+    "\n",
+    "In particular, this rascally data set includes ratings from 5 different individuals for 12 different types of Oreo cookie. Because some of the raters are allergic to disgusting flavors of Oreo, not every taster tasted every type of cookie. More information about the data set can be found [here](https://www.kaggle.com/rtatman/oreo-flavors-tastetest-ratings).\n",
+    "\n",
+    "As you examine the data, a booming voice from the sky instructs you to analyze the data to answer two key questions:\n",
+    "1. is there some difference in mean rating given to different flavors of Oreo? and\n",
+    "2. which flavor (out of those in the data set) is the best?\n",
+    "\n",
+    "**Part A:** Load the data set as a Pandas DataFrame. Then, process it as you see fit. For the analysis, you might create a new DataFrame, or other kinds of Python objects to use the data. Do what feels right, and include an **explanation** in Markdown of how you are processing the data. You **may not** alter the original data file."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 413,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>oreo_flavor</th>\n",
+       "      <th>rater_n</th>\n",
+       "      <th>rater_c</th>\n",
+       "      <th>rater_r</th>\n",
+       "      <th>rater_k</th>\n",
+       "      <th>rater_a</th>\n",
+       "      <th>average_across_raters</th>\n",
+       "      <th>notes_and_discussion</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>pb&amp;j</td>\n",
+       "      <td>1.5</td>\n",
+       "      <td>4.0</td>\n",
+       "      <td>2.0</td>\n",
+       "      <td>-</td>\n",
+       "      <td>-</td>\n",
+       "      <td>2.5000</td>\n",
+       "      <td>strong but artificial taste; peanut butter bet...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>mega stuf</td>\n",
+       "      <td>2.5</td>\n",
+       "      <td>3.0</td>\n",
+       "      <td>4.0</td>\n",
+       "      <td>-</td>\n",
+       "      <td>1.5</td>\n",
+       "      <td>2.7500</td>\n",
+       "      <td>too much stuffing to eat easily, cookies separ...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>lemon</td>\n",
+       "      <td>4.5</td>\n",
+       "      <td>3.5</td>\n",
+       "      <td>1.5</td>\n",
+       "      <td>-</td>\n",
+       "      <td>3.5</td>\n",
+       "      <td>3.2500</td>\n",
+       "      <td>strong artificial lemon flavor</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>chocolate</td>\n",
+       "      <td>3.5</td>\n",
+       "      <td>3.0</td>\n",
+       "      <td>3.5</td>\n",
+       "      <td>3</td>\n",
+       "      <td>4</td>\n",
+       "      <td>3.4000</td>\n",
+       "      <td>weak chocolate flavor, tasted like an American...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>birthday cake</td>\n",
+       "      <td>2.5</td>\n",
+       "      <td>5.0</td>\n",
+       "      <td>2.5</td>\n",
+       "      <td>4</td>\n",
+       "      <td>3</td>\n",
+       "      <td>3.4000</td>\n",
+       "      <td>didn't taste like birthday cake, most like rea...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>5</th>\n",
+       "      <td>double stuf</td>\n",
+       "      <td>3.5</td>\n",
+       "      <td>4.0</td>\n",
+       "      <td>3.0</td>\n",
+       "      <td>3</td>\n",
+       "      <td>3.5</td>\n",
+       "      <td>3.4000</td>\n",
+       "      <td>default Oreos</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>6</th>\n",
+       "      <td>red velvet</td>\n",
+       "      <td>4</td>\n",
+       "      <td>3.0</td>\n",
+       "      <td>4.5</td>\n",
+       "      <td>4</td>\n",
+       "      <td>2.5</td>\n",
+       "      <td>3.6000</td>\n",
+       "      <td>realistic red velvet taste with cream cheese f...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>7</th>\n",
+       "      <td>Dunkin' Donuts Mocha</td>\n",
+       "      <td>2.5</td>\n",
+       "      <td>1.0</td>\n",
+       "      <td>5.0</td>\n",
+       "      <td>5</td>\n",
+       "      <td>5</td>\n",
+       "      <td>3.7000</td>\n",
+       "      <td>tasted like coffee, specifically Dunkin' coffee</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>8</th>\n",
+       "      <td>mini</td>\n",
+       "      <td>3</td>\n",
+       "      <td>4.0</td>\n",
+       "      <td>4.0</td>\n",
+       "      <td>-</td>\n",
+       "      <td>4.25</td>\n",
+       "      <td>3.8125</td>\n",
+       "      <td>taste like Oreos</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>9</th>\n",
+       "      <td>thins, coconut</td>\n",
+       "      <td>3.5</td>\n",
+       "      <td>4.5</td>\n",
+       "      <td>3.0</td>\n",
+       "      <td>4.5</td>\n",
+       "      <td>4.5</td>\n",
+       "      <td>4.0000</td>\n",
+       "      <td>very light coconut flavor, more like a coconut...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>10</th>\n",
+       "      <td>mint</td>\n",
+       "      <td>3.5</td>\n",
+       "      <td>4.0</td>\n",
+       "      <td>4.5</td>\n",
+       "      <td>4</td>\n",
+       "      <td>4.25</td>\n",
+       "      <td>4.0500</td>\n",
+       "      <td>strong mint flavor, creme alone was toothpasty</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>11</th>\n",
+       "      <td>cinnamon bun</td>\n",
+       "      <td>-</td>\n",
+       "      <td>4.5</td>\n",
+       "      <td>4.5</td>\n",
+       "      <td>4.5</td>\n",
+       "      <td>4</td>\n",
+       "      <td>4.3750</td>\n",
+       "      <td>strong cinnamon flavor, did not capture the es...</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "             oreo_flavor rater_n  rater_c  rater_r rater_k rater_a  \\\n",
+       "0                   pb&j     1.5      4.0      2.0       -       -   \n",
+       "1              mega stuf     2.5      3.0      4.0       -     1.5   \n",
+       "2                  lemon     4.5      3.5      1.5       -     3.5   \n",
+       "3              chocolate     3.5      3.0      3.5       3       4   \n",
+       "4          birthday cake     2.5      5.0      2.5       4       3   \n",
+       "5            double stuf     3.5      4.0      3.0       3     3.5   \n",
+       "6             red velvet       4      3.0      4.5       4     2.5   \n",
+       "7   Dunkin' Donuts Mocha     2.5      1.0      5.0       5       5   \n",
+       "8                   mini       3      4.0      4.0       -    4.25   \n",
+       "9         thins, coconut     3.5      4.5      3.0     4.5     4.5   \n",
+       "10                  mint     3.5      4.0      4.5       4    4.25   \n",
+       "11          cinnamon bun       -      4.5      4.5     4.5       4   \n",
+       "\n",
+       "    average_across_raters                               notes_and_discussion  \n",
+       "0                  2.5000  strong but artificial taste; peanut butter bet...  \n",
+       "1                  2.7500  too much stuffing to eat easily, cookies separ...  \n",
+       "2                  3.2500                     strong artificial lemon flavor  \n",
+       "3                  3.4000  weak chocolate flavor, tasted like an American...  \n",
+       "4                  3.4000  didn't taste like birthday cake, most like rea...  \n",
+       "5                  3.4000                                      default Oreos  \n",
+       "6                  3.6000  realistic red velvet taste with cream cheese f...  \n",
+       "7                  3.7000    tasted like coffee, specifically Dunkin' coffee  \n",
+       "8                  3.8125                                   taste like Oreos  \n",
+       "9                  4.0000  very light coconut flavor, more like a coconut...  \n",
+       "10                 4.0500     strong mint flavor, creme alone was toothpasty  \n",
+       "11                 4.3750  strong cinnamon flavor, did not capture the es...  "
+      ]
+     },
+     "execution_count": 413,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# SOLUTION:\n",
+    "\n",
+    "dfRaw = pd.read_csv('./data/oreo_rankings.csv')\n",
+    "dfRaw.head(12)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 434,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "dfO = pd.DataFrame()\n",
+    "for flavor in dfRaw[\"oreo_flavor\"]:\n",
+    "    newdat = []\n",
+    "    for r in [\"rater_n\",\"rater_c\",\"rater_r\",\"rater_k\",\"rater_a\"]:\n",
+    "        rating = dfRaw.loc[dfRaw[\"oreo_flavor\"]==flavor, r].iloc[0]\n",
+    "        if rating != \"-\":\n",
+    "            newdat.append(float(rating))\n",
+    "        else:\n",
+    "            newdat.append(np.nan)\n",
+    "    dfO[flavor] = newdat"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 435,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>pb&amp;j</th>\n",
+       "      <th>mega stuf</th>\n",
+       "      <th>lemon</th>\n",
+       "      <th>chocolate</th>\n",
+       "      <th>birthday cake</th>\n",
+       "      <th>double stuf</th>\n",
+       "      <th>red velvet</th>\n",
+       "      <th>Dunkin' Donuts Mocha</th>\n",
+       "      <th>mini</th>\n",
+       "      <th>thins, coconut</th>\n",
+       "      <th>mint</th>\n",
+       "      <th>cinnamon bun</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>1.5</td>\n",
+       "      <td>2.5</td>\n",
+       "      <td>4.5</td>\n",
+       "      <td>3.5</td>\n",
+       "      <td>2.5</td>\n",
+       "      <td>3.5</td>\n",
+       "      <td>4.0</td>\n",
+       "      <td>2.5</td>\n",
+       "      <td>3.00</td>\n",
+       "      <td>3.5</td>\n",
+       "      <td>3.50</td>\n",
+       "      <td>NaN</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>4.0</td>\n",
+       "      <td>3.0</td>\n",
+       "      <td>3.5</td>\n",
+       "      <td>3.0</td>\n",
+       "      <td>5.0</td>\n",
+       "      <td>4.0</td>\n",
+       "      <td>3.0</td>\n",
+       "      <td>1.0</td>\n",
+       "      <td>4.00</td>\n",
+       "      <td>4.5</td>\n",
+       "      <td>4.00</td>\n",
+       "      <td>4.5</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>2.0</td>\n",
+       "      <td>4.0</td>\n",
+       "      <td>1.5</td>\n",
+       "      <td>3.5</td>\n",
+       "      <td>2.5</td>\n",
+       "      <td>3.0</td>\n",
+       "      <td>4.5</td>\n",
+       "      <td>5.0</td>\n",
+       "      <td>4.00</td>\n",
+       "      <td>3.0</td>\n",
+       "      <td>4.50</td>\n",
+       "      <td>4.5</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>3.0</td>\n",
+       "      <td>4.0</td>\n",
+       "      <td>3.0</td>\n",
+       "      <td>4.0</td>\n",
+       "      <td>5.0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>4.5</td>\n",
+       "      <td>4.00</td>\n",
+       "      <td>4.5</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>NaN</td>\n",
+       "      <td>1.5</td>\n",
+       "      <td>3.5</td>\n",
+       "      <td>4.0</td>\n",
+       "      <td>3.0</td>\n",
+       "      <td>3.5</td>\n",
+       "      <td>2.5</td>\n",
+       "      <td>5.0</td>\n",
+       "      <td>4.25</td>\n",
+       "      <td>4.5</td>\n",
+       "      <td>4.25</td>\n",
+       "      <td>4.0</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   pb&j  mega stuf  lemon  chocolate  birthday cake  double stuf  red velvet  \\\n",
+       "0   1.5        2.5    4.5        3.5            2.5          3.5         4.0   \n",
+       "1   4.0        3.0    3.5        3.0            5.0          4.0         3.0   \n",
+       "2   2.0        4.0    1.5        3.5            2.5          3.0         4.5   \n",
+       "3   NaN        NaN    NaN        3.0            4.0          3.0         4.0   \n",
+       "4   NaN        1.5    3.5        4.0            3.0          3.5         2.5   \n",
+       "\n",
+       "   Dunkin' Donuts Mocha  mini  thins, coconut  mint  cinnamon bun  \n",
+       "0                   2.5  3.00             3.5  3.50           NaN  \n",
+       "1                   1.0  4.00             4.5  4.00           4.5  \n",
+       "2                   5.0  4.00             3.0  4.50           4.5  \n",
+       "3                   5.0   NaN             4.5  4.00           4.5  \n",
+       "4                   5.0  4.25             4.5  4.25           4.0  "
+      ]
+     },
+     "execution_count": 435,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "dfO"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "I created a new Pandas DataFrame where the different columns correspond to the different flavors of Oreo. This will make it easier to do an ANOVA test on the data set beacuse each column corresponds to a different group within the ANOVA analysis."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "**Part B:** In the remainder of this problem, you will perform some hypothesis tests to examine whether these data suggest there are significant differences in the mean ratings of the different Oreo flavors. Pick a level of significance for these experiments, and explain how you decided to use that significance level. \"Because we used it a lot in class\" is ***not*** a good reason."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "**Solution:**\n",
+    "\n",
+    "We will use the 5% significance level. A 5% rate of false positives (accidentally declaring a difference in mean Oreo ratings when no such difference exists) is not that bad: eating gross Oreos one time out of 20 is an acceptable risk.\n",
+    "\n",
+    "If you are more risk-averse, or really don't want to find yourself eating PB&J Oreos (understandable), then you might choose a lower significance level.\n",
+    "\n",
+    "(Any answer that relates the chosen significance level to false positive error rates and risk of making incorrect conclusions is fine.)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "**Part C:** Perform an **Analysis of Variance hypothesis test** in order to determine if there is evidence that there is _some_ difference among the mean ratings given to these 12 Oreo flavors. Clearly state your null and alternative hypothesis, and use the significance level identified in **Part B**. You must show **all** calculations **by hand** (and may of course use Python as a calculator, and to compute values from a distribution using the appropriate percent-point-function (ppf) or cumulative distribution function (cdf)).\n",
+    "\n",
+    "In addition to showing the code for your calculations, make comments **in Markdown** explaining what you are doing."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "**Solution:**\n",
+    "\n",
+    "Our null and alternative hypotheses are:\n",
+    "\n",
+    "$H_0: \\mu_{pb\\&j} = \\mu_{mega~stuf} = \\ldots = \\mu_{cinnamon~bun}$\n",
+    "\n",
+    "$H_1: \\mu_i \\neq \\mu_j$ for some pair $i\\neq j$"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 475,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "54 12\n"
+     ]
+    }
+   ],
+   "source": [
+    "N = sum(dfO.count())\n",
+    "I = len(dfO.columns)\n",
+    "print(N,I)\n",
+    "\n",
+    "df_SSB = I-1\n",
+    "df_SSW = N-I\n",
+    "\n",
+    "grand_mean = dfO.mean().mean()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 450,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "12.01802734375\n"
+     ]
+    }
+   ],
+   "source": [
+    "SSB = 0\n",
+    "for flavor in dfO.columns:\n",
+    "    SSB += dfO[flavor].count()*(dfO[flavor].mean() - grand_mean)**2\n",
+    "print(SSB)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 473,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "37.75937499999999\n"
+     ]
+    }
+   ],
+   "source": [
+    "SSW = 0\n",
+    "for flavor in dfO.columns:\n",
+    "    for j in range(5):\n",
+    "        if not isnan(dfO[flavor][j]):\n",
+    "            SSW += (dfO[flavor][j] - dfO[flavor].mean())**2\n",
+    "print(SSW)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 476,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "1.2152482262833586 0.3071666874253727\n"
+     ]
+    }
+   ],
+   "source": [
+    "F = (SSB/df_SSB)/(SSW/df_SSW)\n",
+    "pval = 1 - stats.f.cdf(F, dfn=df_SSB, dfd=df_SSW)\n",
+    "print(F,pval)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Since our p-value (0.31) is greater than our significance level (0.05), we **fail to reject** the null hypothesis and find that there is insufficient evidence to conclude a difference in means."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "**Part D:** Perform a **t hypothesis test** to determine if there is evidence supporting the claim that cinnamon bun Oreos have a higher mean rating than PB&J Oreos. Use the significance level you identified in **Part B**. Clearly state your null and alternative hypotheses, your conclusions, and show all work. Again, you may not use any canned t-test function."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "**Solution:**\n",
+    "\n",
+    "Our null and alternative hypotheses are:\n",
+    "\n",
+    "$H_0: \\mu_{cb} - \\mu_{pbj} = 0$\n",
+    "\n",
+    "$H_1: \\mu_{cb} - \\mu_{pbj} > 0$\n",
+    "\n",
+    "We will assume that the populations involved are roughly normal, and use a t-distribution.\n",
+    "\n",
+    "Note that we could also use bootstrapping."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 500,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Test statistic: t = 2.4227\n",
+      "p-value = 0.0300\n"
+     ]
+    }
+   ],
+   "source": [
+    "stderr = np.sqrt(dfO[\"cinnamon bun\"].var()/dfO[\"cinnamon bun\"].count() + dfO[\"pb&j\"].var()/dfO[\"pb&j\"].count())\n",
+    "t = (dfO[\"cinnamon bun\"].mean() - dfO[\"pb&j\"].mean())/stderr\n",
+    "df = dfO[\"cinnamon bun\"].count() + dfO[\"pb&j\"].count() - 2\n",
+    "pvalue = 1 - stats.t.cdf(t, df)\n",
+    "print(\"Test statistic: t = {:0.4f}\".format(t))\n",
+    "print(\"p-value = {:0.4f}\".format(pvalue))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "**Part E:** Do your results from Parts C and D agree with one another? If they agree, explain how they are in agreement in _words_. If they do not agree, explain why you think they do not agree.\n",
+    "\n",
+    "_Hint: if they do not agree, consider carefully what assumptions we make in ANOVA and the t-test._"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "**Solution:**\n",
+    "\n",
+    "The two do **not** agree. The ANOVA test (Part C) concludes that there is no significant difference between any of the Oreo flavors' mean ratings, but the t-test (Part D) concludes that the Cinnamon Bun Oreos have a higher mean rating than the PB&J Oreos.\n",
+    "\n",
+    "This could arise because the underlying populations are definitely **not normally distributed**, but we make that assumption in both the ANOVA and the t-test. The populations are not normally distributed because they have hard lower/upper limits (ratings of 0 and 5, respectively).\n",
+    "\n",
+    "Another possible answer is that the data are also probably **not independent samples** because they came from the same 5 people.\n",
+    "\n",
+    "Finally, we also cherry-picked the group with the highest rating and compared it against the group with the lowest rating. There are 12 groups, so $C(12,2) = 66$ possible pairwise comparisons to make. The Bonferroni correction, for example, would reduce our individual significance level to $\\alpha_{adj} = \\alpha/\\text{# comparisons} = 0.05/66 = 0.00076$, at which point our result from Part D would no longer be statistically significant."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 529,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "0.0007575757575757576"
+      ]
+     },
+     "execution_count": 529,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "from scipy.special import binom\n",
+    "0.05/binom(12,2)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<br>\n",
+    "\n",
+    "---\n",
+    "<a id='p2'></a>\n",
+    "[Back to top](#top)\n",
+    "\n",
+    "### [30 points] Problem 2: Multiple Linear Regression to Explain House Hauntings\n",
+    "\n",
+    "<img src=\"https://s-media-cache-ak0.pinimg.com/originals/09/72/01/09720128cff5de4d4af038cd3fcf7f69.jpg\" style=\"width: 300px;\"/>\n",
+    "\n",
+    "In an effort to control the skyrocketing prices of real estate in the Colorado Front Range, Governor Polis implemented a cutting edge new intervention. This new program oversaw the introduction of ghosts back into their natural ecosystem, after the ghost population seriously dwindled in recent decades due to overhaunting. However, an unfortunate miscalculation has led to haunted houses becoming a very serious problem in Colorado. Modern problems require modern solutions, so Governor Polis has hired you and the famous hedgehog data scientist/part-time ghostbuster Amy to determine what features of a house may be used to best predict a `haunted` score, related to the probability that a house with the given features is haunted (higher $\\leftrightarrow$ more likely to be haunted).\n",
+    "\n",
+    "You decide to use multiple linear regression to understand and predict what factors lead to increased haunted house hazard. You collected a data set from Haunted Zillow, the lesser-known database of haunted house prices and attributes. The data cover a variety of potential features, and you'll find this data in the file `houses.csv`. \n",
+    "\n",
+    "**Response**: \n",
+    "\n",
+    "- $\\texttt{haunted}$: a haunting score, related to the probability that a house with the given features is haunted (higher $\\leftrightarrow$ more likely to be haunted)\n",
+    "\n",
+    "**Features**: \n",
+    "\n",
+    "- $\\texttt{age}$: age of the house, in years\n",
+    "- $\\texttt{area}$: square footage of interior of house\n",
+    "- $\\texttt{bathrooms}$: number of bathrooms\n",
+    "- $\\texttt{distance metro}$: distance to the nearest major metropolitan area (in miles)\n",
+    "- $\\texttt{distance cemetery}$: distance to the nearest cemetery (in miles)\n",
+    "- $\\texttt{cats}$: the number of cats within a one-block radius of the house\n",
+    "- $\\texttt{howls}$: the number of wolf howls heard on an average night in the house's neighborhood\n",
+    "- $\\texttt{clouds}$: what percentage of the sky was covered by clouds (fraction, 0-1)\n",
+    "- $\\texttt{precipitation}$: amount of precipitation in the past 72 hours (inches)\n",
+    "- $\\texttt{misery index}$: an economic indicator for how miserable the average United States citizen is, based on the unemployment rate and the inflation rate. More [here](https://www.stuffyoushouldknow.com/podcasts/whats-the-misery-index.htm) and [here](https://en.wikipedia.org/wiki/Misery_index_(economics)). Higher values correspond to more miserable citizens.\n",
+    "- $\\texttt{ice cream sold}$: the number of units of ice cream sold at the farmer's market the week the house was most recently sold"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "**Part A**: Read the data from `houses.csv` into a Pandas DataFrame.  Note that since we will be doing a multiple linear regression we will need all of the features, so you should drop any row in the DataFrame that is missing data. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 519,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>age</th>\n",
+       "      <th>area</th>\n",
+       "      <th>bathrooms</th>\n",
+       "      <th>distance metro</th>\n",
+       "      <th>distance cemetery</th>\n",
+       "      <th>cats</th>\n",
+       "      <th>howls</th>\n",
+       "      <th>clouds</th>\n",
+       "      <th>precipitation</th>\n",
+       "      <th>misery index</th>\n",
+       "      <th>ice cream sold</th>\n",
+       "      <th>haunted</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>65.06</td>\n",
+       "      <td>2041</td>\n",
+       "      <td>1.0</td>\n",
+       "      <td>7.1</td>\n",
+       "      <td>10.01</td>\n",
+       "      <td>7</td>\n",
+       "      <td>3</td>\n",
+       "      <td>1.00</td>\n",
+       "      <td>0.82</td>\n",
+       "      <td>12.99</td>\n",
+       "      <td>273</td>\n",
+       "      <td>-0.596150</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>141.48</td>\n",
+       "      <td>1564</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>7.4</td>\n",
+       "      <td>4.07</td>\n",
+       "      <td>5</td>\n",
+       "      <td>5</td>\n",
+       "      <td>1.00</td>\n",
+       "      <td>0.99</td>\n",
+       "      <td>16.77</td>\n",
+       "      <td>184</td>\n",
+       "      <td>-0.146465</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>7.58</td>\n",
+       "      <td>1637</td>\n",
+       "      <td>3.0</td>\n",
+       "      <td>7.0</td>\n",
+       "      <td>3.36</td>\n",
+       "      <td>2</td>\n",
+       "      <td>0</td>\n",
+       "      <td>1.00</td>\n",
+       "      <td>1.17</td>\n",
+       "      <td>16.49</td>\n",
+       "      <td>141</td>\n",
+       "      <td>-0.303117</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>51.47</td>\n",
+       "      <td>2021</td>\n",
+       "      <td>2.0</td>\n",
+       "      <td>7.9</td>\n",
+       "      <td>3.43</td>\n",
+       "      <td>6</td>\n",
+       "      <td>8</td>\n",
+       "      <td>0.13</td>\n",
+       "      <td>0.92</td>\n",
+       "      <td>8.28</td>\n",
+       "      <td>146</td>\n",
+       "      <td>0.339912</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>259.44</td>\n",
+       "      <td>1642</td>\n",
+       "      <td>1.0</td>\n",
+       "      <td>7.5</td>\n",
+       "      <td>3.19</td>\n",
+       "      <td>4</td>\n",
+       "      <td>1</td>\n",
+       "      <td>1.00</td>\n",
+       "      <td>1.73</td>\n",
+       "      <td>5.90</td>\n",
+       "      <td>178</td>\n",
+       "      <td>0.724867</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "      age  area  bathrooms  distance metro  distance cemetery  cats  howls  \\\n",
+       "0   65.06  2041        1.0             7.1              10.01     7      3   \n",
+       "1  141.48  1564        0.0             7.4               4.07     5      5   \n",
+       "2    7.58  1637        3.0             7.0               3.36     2      0   \n",
+       "3   51.47  2021        2.0             7.9               3.43     6      8   \n",
+       "4  259.44  1642        1.0             7.5               3.19     4      1   \n",
+       "\n",
+       "   clouds  precipitation  misery index  ice cream sold   haunted  \n",
+       "0    1.00           0.82         12.99             273 -0.596150  \n",
+       "1    1.00           0.99         16.77             184 -0.146465  \n",
+       "2    1.00           1.17         16.49             141 -0.303117  \n",
+       "3    0.13           0.92          8.28             146  0.339912  \n",
+       "4    1.00           1.73          5.90             178  0.724867  "
+      ]
+     },
+     "execution_count": 519,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "file_path = \"data/houses.csv\"\n",
+    "\n",
+    "dfH = pd.read_csv(file_path)\n",
+    "dfH = dfH.dropna()\n",
+    "dfH.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "**Part B**: Perform the appropriate statistical test at the $\\alpha = 0.01$ significance level to determine if _at least one_ of the features is related to the the response $y$.  Clearly describe your methodology and show all computations in Python. "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "collapsed": true
+   },
+   "source": [
+    "**Solution**: \n",
+    "\n",
+    "We perform a full F-test with the hypotheses: \n",
+    "\n",
+    "$$\n",
+    "\\begin{array}{ll}\n",
+    "H_0: & \\beta_1 = \\beta_2 = \\ldots = \\beta_{8} = \\beta_{9} = \\beta_{10} = \\beta_{11} = 0  \\\\\n",
+    "H_1: & \\beta_k \\neq 0 \\textrm{ for at least one } k=1, 2, \\ldots, 11  \\\\\n",
+    "\\end{array}\n",
+    "$$\n",
+    "\n",
+    "Luckily, sm.OLS can perform this test for us.  We have "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 520,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<table class=\"simpletable\">\n",
+       "<caption>OLS Regression Results</caption>\n",
+       "<tr>\n",
+       "  <th>Dep. Variable:</th>         <td>haunted</td>     <th>  R-squared:         </th> <td>   0.948</td>\n",
+       "</tr>\n",
+       "<tr>\n",
+       "  <th>Model:</th>                   <td>OLS</td>       <th>  Adj. R-squared:    </th> <td>   0.938</td>\n",
+       "</tr>\n",
+       "<tr>\n",
+       "  <th>Method:</th>             <td>Least Squares</td>  <th>  F-statistic:       </th> <td>   94.60</td>\n",
+       "</tr>\n",
+       "<tr>\n",
+       "  <th>Date:</th>             <td>Thu, 18 Apr 2019</td> <th>  Prob (F-statistic):</th> <td>1.97e-32</td>\n",
+       "</tr>\n",
+       "<tr>\n",
+       "  <th>Time:</th>                 <td>12:24:14</td>     <th>  Log-Likelihood:    </th> <td>  13.575</td>\n",
+       "</tr>\n",
+       "<tr>\n",
+       "  <th>No. Observations:</th>      <td>    69</td>      <th>  AIC:               </th> <td>  -3.151</td>\n",
+       "</tr>\n",
+       "<tr>\n",
+       "  <th>Df Residuals:</th>          <td>    57</td>      <th>  BIC:               </th> <td>   23.66</td>\n",
+       "</tr>\n",
+       "<tr>\n",
+       "  <th>Df Model:</th>              <td>    11</td>      <th>                     </th>     <td> </td>   \n",
+       "</tr>\n",
+       "<tr>\n",
+       "  <th>Covariance Type:</th>      <td>nonrobust</td>    <th>                     </th>     <td> </td>   \n",
+       "</tr>\n",
+       "</table>\n",
+       "<table class=\"simpletable\">\n",
+       "<tr>\n",
+       "          <td></td>             <th>coef</th>     <th>std err</th>      <th>t</th>      <th>P>|t|</th>  <th>[0.025</th>    <th>0.975]</th>  \n",
+       "</tr>\n",
+       "<tr>\n",
+       "  <th>const</th>             <td>    0.3480</td> <td>    0.323</td> <td>    1.078</td> <td> 0.285</td> <td>   -0.298</td> <td>    0.994</td>\n",
+       "</tr>\n",
+       "<tr>\n",
+       "  <th>age</th>               <td>    0.0017</td> <td>    0.000</td> <td>    5.859</td> <td> 0.000</td> <td>    0.001</td> <td>    0.002</td>\n",
+       "</tr>\n",
+       "<tr>\n",
+       "  <th>area</th>              <td>  5.83e-05</td> <td> 6.16e-05</td> <td>    0.946</td> <td> 0.348</td> <td>-6.51e-05</td> <td>    0.000</td>\n",
+       "</tr>\n",
+       "<tr>\n",
+       "  <th>bathrooms</th>         <td>   -0.0411</td> <td>    0.023</td> <td>   -1.806</td> <td> 0.076</td> <td>   -0.087</td> <td>    0.004</td>\n",
+       "</tr>\n",
+       "<tr>\n",
+       "  <th>distance metro</th>    <td>   -0.0142</td> <td>    0.032</td> <td>   -0.443</td> <td> 0.660</td> <td>   -0.079</td> <td>    0.050</td>\n",
+       "</tr>\n",
+       "<tr>\n",
+       "  <th>distance cemetery</th> <td>   -0.1000</td> <td>    0.003</td> <td>  -30.867</td> <td> 0.000</td> <td>   -0.106</td> <td>   -0.093</td>\n",
+       "</tr>\n",
+       "<tr>\n",
+       "  <th>cats</th>              <td>    0.0316</td> <td>    0.010</td> <td>    3.258</td> <td> 0.002</td> <td>    0.012</td> <td>    0.051</td>\n",
+       "</tr>\n",
+       "<tr>\n",
+       "  <th>howls</th>             <td>    0.0056</td> <td>    0.011</td> <td>    0.494</td> <td> 0.623</td> <td>   -0.017</td> <td>    0.029</td>\n",
+       "</tr>\n",
+       "<tr>\n",
+       "  <th>clouds</th>            <td>    0.0902</td> <td>    0.123</td> <td>    0.734</td> <td> 0.466</td> <td>   -0.156</td> <td>    0.336</td>\n",
+       "</tr>\n",
+       "<tr>\n",
+       "  <th>precipitation</th>     <td>    0.0068</td> <td>    0.067</td> <td>    0.102</td> <td> 0.919</td> <td>   -0.128</td> <td>    0.141</td>\n",
+       "</tr>\n",
+       "<tr>\n",
+       "  <th>misery index</th>      <td>   -0.0082</td> <td>    0.006</td> <td>   -1.456</td> <td> 0.151</td> <td>   -0.020</td> <td>    0.003</td>\n",
+       "</tr>\n",
+       "<tr>\n",
+       "  <th>ice cream sold</th>    <td>   -0.0006</td> <td>    0.001</td> <td>   -1.274</td> <td> 0.208</td> <td>   -0.002</td> <td>    0.000</td>\n",
+       "</tr>\n",
+       "</table>\n",
+       "<table class=\"simpletable\">\n",
+       "<tr>\n",
+       "  <th>Omnibus:</th>       <td> 1.629</td> <th>  Durbin-Watson:     </th> <td>   2.191</td>\n",
+       "</tr>\n",
+       "<tr>\n",
+       "  <th>Prob(Omnibus):</th> <td> 0.443</td> <th>  Jarque-Bera (JB):  </th> <td>   1.480</td>\n",
+       "</tr>\n",
+       "<tr>\n",
+       "  <th>Skew:</th>          <td> 0.230</td> <th>  Prob(JB):          </th> <td>   0.477</td>\n",
+       "</tr>\n",
+       "<tr>\n",
+       "  <th>Kurtosis:</th>      <td> 2.450</td> <th>  Cond. No.          </th> <td>2.55e+04</td>\n",
+       "</tr>\n",
+       "</table>"
+      ],
+      "text/plain": [
+       "<class 'statsmodels.iolib.summary.Summary'>\n",
+       "\"\"\"\n",
+       "                            OLS Regression Results                            \n",
+       "==============================================================================\n",
+       "Dep. Variable:                haunted   R-squared:                       0.948\n",
+       "Model:                            OLS   Adj. R-squared:                  0.938\n",
+       "Method:                 Least Squares   F-statistic:                     94.60\n",
+       "Date:                Thu, 18 Apr 2019   Prob (F-statistic):           1.97e-32\n",
+       "Time:                        12:24:14   Log-Likelihood:                 13.575\n",
+       "No. Observations:                  69   AIC:                            -3.151\n",
+       "Df Residuals:                      57   BIC:                             23.66\n",
+       "Df Model:                          11                                         \n",
+       "Covariance Type:            nonrobust                                         \n",
+       "=====================================================================================\n",
+       "                        coef    std err          t      P>|t|      [0.025      0.975]\n",
+       "-------------------------------------------------------------------------------------\n",
+       "const                 0.3480      0.323      1.078      0.285      -0.298       0.994\n",
+       "age                   0.0017      0.000      5.859      0.000       0.001       0.002\n",
+       "area                5.83e-05   6.16e-05      0.946      0.348   -6.51e-05       0.000\n",
+       "bathrooms            -0.0411      0.023     -1.806      0.076      -0.087       0.004\n",
+       "distance metro       -0.0142      0.032     -0.443      0.660      -0.079       0.050\n",
+       "distance cemetery    -0.1000      0.003    -30.867      0.000      -0.106      -0.093\n",
+       "cats                  0.0316      0.010      3.258      0.002       0.012       0.051\n",
+       "howls                 0.0056      0.011      0.494      0.623      -0.017       0.029\n",
+       "clouds                0.0902      0.123      0.734      0.466      -0.156       0.336\n",
+       "precipitation         0.0068      0.067      0.102      0.919      -0.128       0.141\n",
+       "misery index         -0.0082      0.006     -1.456      0.151      -0.020       0.003\n",
+       "ice cream sold       -0.0006      0.001     -1.274      0.208      -0.002       0.000\n",
+       "==============================================================================\n",
+       "Omnibus:                        1.629   Durbin-Watson:                   2.191\n",
+       "Prob(Omnibus):                  0.443   Jarque-Bera (JB):                1.480\n",
+       "Skew:                           0.230   Prob(JB):                        0.477\n",
+       "Kurtosis:                       2.450   Cond. No.                     2.55e+04\n",
+       "==============================================================================\n",
+       "\n",
+       "Warnings:\n",
+       "[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.\n",
+       "[2] The condition number is large, 2.55e+04. This might indicate that there are\n",
+       "strong multicollinearity or other numerical problems.\n",
+       "\"\"\""
+      ]
+     },
+     "execution_count": 520,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "y = dfH[\"haunted\"]\n",
+    "Xfull = dfH.loc[:,dfH.columns != \"haunted\"]\n",
+    "Xfull = sm.add_constant(Xfull)\n",
+    "full_model = sm.OLS(y, Xfull).fit()\n",
+    "full_model.summary()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "From the model summary we see that the F-statistic of interest is $F = 94.6$ with an associated p-value of $1.97\\times 10^{-32}$.  Since this is (WAY) less than $\\alpha = 0.01$ we reject the null hypothesis and conclude that at least one of the provided features is related to the response. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "**Part C**: Write a function `forward_select(df, resp_str, maxk)` that takes in the DataFrame, the name of the column corresponding to the response, and the maximum number of desired features, and returns a list of feature names corresponding to the `maxk` most important features via forward selection.  At each stage in forward selection you should add the feature whose inclusion in the model would result in the lowest sum of squared errors $(SSE)$. Use your function to determine the best $k=5$ features to include in the model. Clearly indicate which feature was added in each stage. \n",
+    "\n",
+    "**Note**: The point of this exercise is to see if you can implement **foward_select** yourself.  You may of course use canned routines like statmodels OLS, but you may not call any Python method that explicitly performs forward selection."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 521,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Stage 1, added feature: distance cemetery\n",
+      "Stage 2, added feature: age\n",
+      "Stage 3, added feature: cats\n",
+      "Stage 4, added feature: bathrooms\n",
+      "Stage 5, added feature: misery index\n"
+     ]
+    }
+   ],
+   "source": [
+    "def forward_select(df, resp_str=\"haunted\", maxk=3):\n",
+    "    \n",
+    "    # set response vector \n",
+    "    y = df[resp_str]\n",
+    "    \n",
+    "    # get potential features \n",
+    "    remaining_features = list(df.columns[df.columns != resp_str])\n",
+    "    \n",
+    "    # initialize good features list \n",
+    "    good_features = []\n",
+    "    \n",
+    "    # perform forward selection \n",
+    "    for p in range(maxk):\n",
+    "        SSEs = []\n",
+    "        for feat in remaining_features:\n",
+    "            X = df[good_features + [feat]]\n",
+    "            X = sm.add_constant(X)\n",
+    "            model = sm.OLS(y, X).fit() \n",
+    "            SSEs.append(np.sum((y-model.predict(X))**2))\n",
+    "        new_feat = remaining_features[np.argmin(SSEs)]\n",
+    "        good_features = good_features + [new_feat]\n",
+    "        remaining_features.remove(new_feat)\n",
+    "        print(\"Stage {}, added feature: {}\".format(p+1, new_feat))\n",
+    "        \n",
+    "    return good_features\n",
+    "              \n",
+    "good_features = forward_select(dfH, resp_str=\"haunted\", maxk=5)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "**Part D**: Write down the multiple linear regression model, including estimated parameters, obtained by your forward selection process. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 522,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<table class=\"simpletable\">\n",
+       "<caption>OLS Regression Results</caption>\n",
+       "<tr>\n",
+       "  <th>Dep. Variable:</th>         <td>haunted</td>     <th>  R-squared:         </th> <td>   0.946</td>\n",
+       "</tr>\n",
+       "<tr>\n",
+       "  <th>Model:</th>                   <td>OLS</td>       <th>  Adj. R-squared:    </th> <td>   0.941</td>\n",
+       "</tr>\n",
+       "<tr>\n",
+       "  <th>Method:</th>             <td>Least Squares</td>  <th>  F-statistic:       </th> <td>   218.7</td>\n",
+       "</tr>\n",
+       "<tr>\n",
+       "  <th>Date:</th>             <td>Thu, 18 Apr 2019</td> <th>  Prob (F-statistic):</th> <td>2.00e-38</td>\n",
+       "</tr>\n",
+       "<tr>\n",
+       "  <th>Time:</th>                 <td>12:24:44</td>     <th>  Log-Likelihood:    </th> <td>  11.932</td>\n",
+       "</tr>\n",
+       "<tr>\n",
+       "  <th>No. Observations:</th>      <td>    69</td>      <th>  AIC:               </th> <td>  -11.86</td>\n",
+       "</tr>\n",
+       "<tr>\n",
+       "  <th>Df Residuals:</th>          <td>    63</td>      <th>  BIC:               </th> <td>   1.541</td>\n",
+       "</tr>\n",
+       "<tr>\n",
+       "  <th>Df Model:</th>              <td>     5</td>      <th>                     </th>     <td> </td>   \n",
+       "</tr>\n",
+       "<tr>\n",
+       "  <th>Covariance Type:</th>      <td>nonrobust</td>    <th>                     </th>     <td> </td>   \n",
+       "</tr>\n",
+       "</table>\n",
+       "<table class=\"simpletable\">\n",
+       "<tr>\n",
+       "          <td></td>             <th>coef</th>     <th>std err</th>      <th>t</th>      <th>P>|t|</th>  <th>[0.025</th>    <th>0.975]</th>  \n",
+       "</tr>\n",
+       "<tr>\n",
+       "  <th>const</th>             <td>    0.3456</td> <td>    0.107</td> <td>    3.220</td> <td> 0.002</td> <td>    0.131</td> <td>    0.560</td>\n",
+       "</tr>\n",
+       "<tr>\n",
+       "  <th>distance cemetery</th> <td>   -0.1005</td> <td>    0.003</td> <td>  -32.801</td> <td> 0.000</td> <td>   -0.107</td> <td>   -0.094</td>\n",
+       "</tr>\n",
+       "<tr>\n",
+       "  <th>age</th>               <td>    0.0018</td> <td>    0.000</td> <td>    6.506</td> <td> 0.000</td> <td>    0.001</td> <td>    0.002</td>\n",
+       "</tr>\n",
+       "<tr>\n",
+       "  <th>cats</th>              <td>    0.0327</td> <td>    0.009</td> <td>    3.545</td> <td> 0.001</td> <td>    0.014</td> <td>    0.051</td>\n",
+       "</tr>\n",
+       "<tr>\n",
+       "  <th>bathrooms</th>         <td>   -0.0382</td> <td>    0.022</td> <td>   -1.747</td> <td> 0.085</td> <td>   -0.082</td> <td>    0.005</td>\n",
+       "</tr>\n",
+       "<tr>\n",
+       "  <th>misery index</th>      <td>   -0.0087</td> <td>    0.005</td> <td>   -1.592</td> <td> 0.116</td> <td>   -0.020</td> <td>    0.002</td>\n",
+       "</tr>\n",
+       "</table>\n",
+       "<table class=\"simpletable\">\n",
+       "<tr>\n",
+       "  <th>Omnibus:</th>       <td> 1.395</td> <th>  Durbin-Watson:     </th> <td>   2.178</td>\n",
+       "</tr>\n",
+       "<tr>\n",
+       "  <th>Prob(Omnibus):</th> <td> 0.498</td> <th>  Jarque-Bera (JB):  </th> <td>   1.434</td>\n",
+       "</tr>\n",
+       "<tr>\n",
+       "  <th>Skew:</th>          <td> 0.289</td> <th>  Prob(JB):          </th> <td>   0.488</td>\n",
+       "</tr>\n",
+       "<tr>\n",
+       "  <th>Kurtosis:</th>      <td> 2.595</td> <th>  Cond. No.          </th> <td>    739.</td>\n",
+       "</tr>\n",
+       "</table>"
+      ],
+      "text/plain": [
+       "<class 'statsmodels.iolib.summary.Summary'>\n",
+       "\"\"\"\n",
+       "                            OLS Regression Results                            \n",
+       "==============================================================================\n",
+       "Dep. Variable:                haunted   R-squared:                       0.946\n",
+       "Model:                            OLS   Adj. R-squared:                  0.941\n",
+       "Method:                 Least Squares   F-statistic:                     218.7\n",
+       "Date:                Thu, 18 Apr 2019   Prob (F-statistic):           2.00e-38\n",
+       "Time:                        12:24:44   Log-Likelihood:                 11.932\n",
+       "No. Observations:                  69   AIC:                            -11.86\n",
+       "Df Residuals:                      63   BIC:                             1.541\n",
+       "Df Model:                           5                                         \n",
+       "Covariance Type:            nonrobust                                         \n",
+       "=====================================================================================\n",
+       "                        coef    std err          t      P>|t|      [0.025      0.975]\n",
+       "-------------------------------------------------------------------------------------\n",
+       "const                 0.3456      0.107      3.220      0.002       0.131       0.560\n",
+       "distance cemetery    -0.1005      0.003    -32.801      0.000      -0.107      -0.094\n",
+       "age                   0.0018      0.000      6.506      0.000       0.001       0.002\n",
+       "cats                  0.0327      0.009      3.545      0.001       0.014       0.051\n",
+       "bathrooms            -0.0382      0.022     -1.747      0.085      -0.082       0.005\n",
+       "misery index         -0.0087      0.005     -1.592      0.116      -0.020       0.002\n",
+       "==============================================================================\n",
+       "Omnibus:                        1.395   Durbin-Watson:                   2.178\n",
+       "Prob(Omnibus):                  0.498   Jarque-Bera (JB):                1.434\n",
+       "Skew:                           0.289   Prob(JB):                        0.488\n",
+       "Kurtosis:                       2.595   Cond. No.                         739.\n",
+       "==============================================================================\n",
+       "\n",
+       "Warnings:\n",
+       "[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.\n",
+       "\"\"\""
+      ]
+     },
+     "execution_count": 522,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "y = dfH[\"haunted\"]\n",
+    "Xred = dfH.loc[:, good_features]\n",
+    "Xred = sm.add_constant(Xred)\n",
+    "red_model = sm.OLS(y, Xred).fit()\n",
+    "red_model.summary()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "**Solution:**\n",
+    "\n",
+    "The obtained reduced model is: \n",
+    "\n",
+    "$$\n",
+    "\\hat{y} = 0.3456 - 0.1005 \\times\\texttt{distance_cemetery} \n",
+    "+ 0.0018\\times\\texttt{age} \n",
+    "+ 0.0327\\times\\texttt{cats} \n",
+    "- 0.0382\\times\\texttt{bathrooms} \n",
+    "- 0.0087\\times\\texttt{misery_index} \n",
+    "$$"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "**Part E**: Perform the appropriate statistical test at the $\\alpha = 0.05$ significance level to determine whether there is a statistically significant difference between the full model with all features and the reduced model obtained by forward selection in **Part D**. "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "**Solution**: \n",
+    "\n",
+    "Our null hypothesis is that the true parameters on the features not included in the reduced model are zero.  Our alternate hypothesis is that at least one of the slopes associated with a missing feature is important: \n",
+    "\n",
+    "$$\n",
+    "\\begin{array}{ll}\n",
+    "H_0: \\beta_{area} = \\beta_{distance~metro} = \\beta_{howls} = \\beta_{clouds} = \\beta_{precipitation} = \\beta_{ice~cream} = 0 \\\\\n",
+    "H_1: \\beta_{k} \\neq 0 \\textrm{ for at least one } k \\in \\{area, distance~metro, howls, \\ldots, ice~cream \\} \\\\\n",
+    "\\end{array}\n",
+    "$$\n",
+    "\n",
+    "We will evaluate our hypothesis by performing a Partial F-Test of the form \n",
+    "\n",
+    "$$\n",
+    "F = \\dfrac{(SSE_{red} - SSE_{full})/(p-k)}{SSE_{full}/(n-p-1)} \\sim F_{p-k, n-p-1}\n",
+    "$$"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 523,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "SSE_full =  2.72573505045407\n",
+      "SSE_red =  2.8587185114604625\n",
+      "num_dfs = 3\n",
+      "den_dfs = 76\n",
+      "F = 1.236\n",
+      "P(>F) = 0.302575499194099\n",
+      "RR: F > = 2.7249439202759165\n"
+     ]
+    }
+   ],
+   "source": [
+    "SSE_red = np.sum((y-red_model.predict(Xred))**2)\n",
+    "SSE_full = np.sum((y-full_model.predict(Xfull))**2)\n",
+    "p = len(dfS.columns)-1\n",
+    "k = len(good_features) \n",
+    "n = len(dfS)\n",
+    "F = ((SSE_red - SSE_full)/(p-k))/((SSE_full)/(n-p-1))\n",
+    "print(\"SSE_full = \", SSE_full)\n",
+    "print(\"SSE_red = \", SSE_red)\n",
+    "print(\"num_dfs = {}\".format(p-k))\n",
+    "print(\"den_dfs = {}\".format(n-p-1))\n",
+    "print(\"F = {:.3f}\".format(F))\n",
+    "pval = 1 - stats.f.cdf(F, p-k, n-p-1)\n",
+    "print(\"P(>F) = {}\".format(pval))\n",
+    "print(\"RR: F > = {}\".format(stats.f.ppf(1-.05, p-k, n-p-1)))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Since our p-value (0.30) is greater than $\\alpha = 0.05$ we fail to reject the null hypothesis and thus conclude that there is insufficient evidence to believe that the full model is statistically significantly better than the reduced model obtained by forward selection. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "**Part F**: Based on your conclusions in **Part E**, use the _better_ of the two models to predict the haunted house hazard when the following features are observed: \n",
+    "\n",
+    "- $\\texttt{age}$: 100 years\n",
+    "- $\\texttt{area}$: 2200 square feet\n",
+    "- $\\texttt{bathrooms}$: 3 bathrooms\n",
+    "- $\\texttt{distance metro}$: 25 miles\n",
+    "- $\\texttt{distance cemetery}$: 10 miles\n",
+    "- $\\texttt{cats}$: 4 cats\n",
+    "- $\\texttt{howls}$: 5 wolf howls/night\n",
+    "- $\\texttt{clouds}$: 0.65 cloud cover\n",
+    "- $\\texttt{precipitation}$: 0 inches\n",
+    "- $\\texttt{misery index}$: 10\n",
+    "- $\\texttt{ice cream sold}$: 125"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "**Solution**:\n",
+    "\n",
+    "Using only the features in our reduced model, we have "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 524,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "yhat = -0.552\n"
+     ]
+    }
+   ],
+   "source": [
+    "data = {\"const\": 1, \"age\": 100, \"area\": 2200, \"bathrooms\": 3, \"distance metro\": 25, \"distance cemetery\": 10, \\\n",
+    "        \"cats\": 4, \"howls\": 5, \"clouds\": 0.65, \"precipitation\": 0, \"misery index\": 10, \"ice cream sold\": 125}\n",
+    "yhat = 0\n",
+    "for feat, slope in zip(red_model.params.index, red_model.params):\n",
+    "    yhat += data[feat] * slope \n",
+    "print(\"yhat = {:.3f}\".format(yhat))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "**Part G:** Governor Polis dabbles a bit in the art of data science, as well as the science of data art. He tells you that the response (`haunted` score) that you and Amy predicted is actually the natural logarithm of the _odds_ that a house with the given features is haunted, where if $p$ is the probability that a house is haunted, then the odds are given by $$\\text{odds} = \\dfrac{p}{1-p}$$\n",
+    "\n",
+    "What transformation must you make in order to turn your multiple regression model into a logistic regression model, to classify a house a haunted or not? Perform this simple transformation, then use a decision threshold of 0.5 to classify the house from **Part F** as haunted or not haunted. No new models should be fit here; use the same model that you used in Part F."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "collapsed": true
+   },
+   "source": [
+    "**Solution:**\n",
+    "\n",
+    "Logistic regression gives the probability of a house being haunted as \n",
+    "\n",
+    "$$p(\\text{haunted} \\mid x_1, x_2, \\ldots) = \\dfrac{1}{1+\\texttt{exp}[-(\\beta_0 + \\beta_1x_1 + \\ldots + \\beta_p x_p)]}$$\n",
+    "\n",
+    "We already solved for the term in the exponent, namely\n",
+    "$$\\hat{y} = \\beta_0 + \\beta_1 x_1 + \\beta_2 x_2 + \\beta_3 x_3 = -0.552$$\n",
+    "\n",
+    "So we plug this in to find:\n",
+    "$$p(\\text{haunted} \\mid x_1, x_2, \\ldots) = \\dfrac{1}{1+\\texttt{exp}[-(-0.552)]} \\approx 0.365$$\n",
+    "\n",
+    "This probability is less than 0.5, therefore, we classify the house as **not haunted**."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 525,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "0.36537222348297044"
+      ]
+     },
+     "execution_count": 525,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "1/(1+np.exp(-yhat))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# creation of new data set"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 313,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>clouds</th>\n",
+       "      <th>earthquake</th>\n",
+       "      <th>pizzas sold</th>\n",
+       "      <th>taunts</th>\n",
+       "      <th>pressure</th>\n",
+       "      <th>shark attacks</th>\n",
+       "      <th>octopuses</th>\n",
+       "      <th>precipitation</th>\n",
+       "      <th>misery index</th>\n",
+       "      <th>ice cream sold</th>\n",
+       "      <th>humidity</th>\n",
+       "      <th>temperature</th>\n",
+       "      <th>Dans shoe size</th>\n",
+       "      <th>Tonys shoe size</th>\n",
+       "      <th>sharknado hazard</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>1.00</td>\n",
+       "      <td>7.1</td>\n",
+       "      <td>5560.0</td>\n",
+       "      <td>15.0</td>\n",
+       "      <td>847.12</td>\n",
+       "      <td>2.0</td>\n",
+       "      <td>7.0</td>\n",
+       "      <td>0.824059</td>\n",
+       "      <td>12.987180</td>\n",
+       "      <td>273.0</td>\n",
+       "      <td>86.41</td>\n",
+       "      <td>78.0</td>\n",
+       "      <td>42.0</td>\n",
+       "      <td>9.0</td>\n",
+       "      <td>40.22</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>1.00</td>\n",
+       "      <td>7.4</td>\n",
+       "      <td>5179.0</td>\n",
+       "      <td>20.0</td>\n",
+       "      <td>844.34</td>\n",
+       "      <td>4.0</td>\n",
+       "      <td>5.0</td>\n",
+       "      <td>0.993296</td>\n",
+       "      <td>16.765435</td>\n",
+       "      <td>184.0</td>\n",
+       "      <td>96.67</td>\n",
+       "      <td>89.0</td>\n",
+       "      <td>42.0</td>\n",
+       "      <td>9.5</td>\n",
+       "      <td>36.42</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>1.00</td>\n",
+       "      <td>7.0</td>\n",
+       "      <td>5227.0</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>839.48</td>\n",
+       "      <td>9.0</td>\n",
+       "      <td>2.0</td>\n",
+       "      <td>1.173342</td>\n",
+       "      <td>16.494518</td>\n",
+       "      <td>141.0</td>\n",
+       "      <td>53.85</td>\n",
+       "      <td>65.0</td>\n",
+       "      <td>9.5</td>\n",
+       "      <td>9.0</td>\n",
+       "      <td>19.54</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>0.13</td>\n",
+       "      <td>7.9</td>\n",
+       "      <td>5226.0</td>\n",
+       "      <td>34.0</td>\n",
+       "      <td>851.28</td>\n",
+       "      <td>2.0</td>\n",
+       "      <td>6.0</td>\n",
+       "      <td>0.919291</td>\n",
+       "      <td>8.277176</td>\n",
+       "      <td>146.0</td>\n",
+       "      <td>88.72</td>\n",
+       "      <td>36.0</td>\n",
+       "      <td>9.5</td>\n",
+       "      <td>10.0</td>\n",
+       "      <td>85.00</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>1.00</td>\n",
+       "      <td>7.5</td>\n",
+       "      <td>5491.0</td>\n",
+       "      <td>6.0</td>\n",
+       "      <td>852.67</td>\n",
+       "      <td>2.0</td>\n",
+       "      <td>4.0</td>\n",
+       "      <td>1.729127</td>\n",
+       "      <td>5.904750</td>\n",
+       "      <td>178.0</td>\n",
+       "      <td>63.08</td>\n",
+       "      <td>72.0</td>\n",
+       "      <td>42.0</td>\n",
+       "      <td>9.0</td>\n",
+       "      <td>56.34</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   clouds  earthquake  pizzas sold  taunts  pressure  shark attacks  \\\n",
+       "0    1.00         7.1       5560.0    15.0    847.12            2.0   \n",
+       "1    1.00         7.4       5179.0    20.0    844.34            4.0   \n",
+       "2    1.00         7.0       5227.0     0.0    839.48            9.0   \n",
+       "3    0.13         7.9       5226.0    34.0    851.28            2.0   \n",
+       "4    1.00         7.5       5491.0     6.0    852.67            2.0   \n",
+       "\n",
+       "   octopuses  precipitation  misery index  ice cream sold  humidity  \\\n",
+       "0        7.0       0.824059     12.987180           273.0     86.41   \n",
+       "1        5.0       0.993296     16.765435           184.0     96.67   \n",
+       "2        2.0       1.173342     16.494518           141.0     53.85   \n",
+       "3        6.0       0.919291      8.277176           146.0     88.72   \n",
+       "4        4.0       1.729127      5.904750           178.0     63.08   \n",
+       "\n",
+       "   temperature  Dans shoe size  Tonys shoe size  sharknado hazard  \n",
+       "0         78.0            42.0              9.0             40.22  \n",
+       "1         89.0            42.0              9.5             36.42  \n",
+       "2         65.0             9.5              9.0             19.54  \n",
+       "3         36.0             9.5             10.0             85.00  \n",
+       "4         72.0            42.0              9.0             56.34  "
+      ]
+     },
+     "execution_count": 313,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "dfOld = pd.read_csv(\"data/sharknadoes_fall2018.csv\")\n",
+    "dfOld = dfOld.dropna()\n",
+    "dfOld.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 325,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "clouds                  0.777222\n",
+      "distance metro          6.940278\n",
+      "age                   151.486111\n",
+      "howls                   5.236111\n",
+      "distance cemetery       5.835694\n",
+      "bathrooms               2.250000\n",
+      "cats                    5.263889\n",
+      "precipitation           1.146111\n",
+      "misery index           12.266806\n",
+      "ice cream sold        185.055556\n",
+      "area                 2004.444444\n",
+      "haunted                60.100694\n",
+      "dtype: float64\n"
+     ]
+    }
+   ],
+   "source": [
+    "# creation of new data set\n",
+    "dfNew = dfOld.copy()\n",
+    "\n",
+    "dfNew.drop(columns=[\"Tonys shoe size\", \"Dans shoe size\", \"temperature\"], inplace=True)\n",
+    "dfNew.rename(columns = {\"octopuses\":\"cats\", \"taunts\":\"howls\", \"pizzas sold\":\"age\", \"earthquake\":\"distance metro\", \\\n",
+    "              \"pressure\":\"distance cemetery\", \"humidity\":\"area\", \"shark attacks\":\"bathrooms\", \\\n",
+    "              \"sharknado hazard\":\"haunted\"}, inplace=True)\n",
+    "dfNew[\"age\"] = np.round(stats.uniform.rvs(loc=0, scale=300, size=len(dfNew)),2)\n",
+    "dfNew[\"howls\"] = np.floor(dfNew[\"howls\"]/4)\n",
+    "dfNew[\"distance cemetery\"] = np.round(stats.lognorm.rvs(loc=3, s=1.25, size=len(dfNew)), 2)\n",
+    "dfNew[\"bathrooms\"] = stats.binom.rvs(n=5, p=0.45, size=len(dfNew))\n",
+    "dfNew[\"area\"] = np.round(stats.norm.rvs(loc=2000, scale=375, size=len(dfNew)), 0)\n",
+    "dfNew[\"precipitation\"] = np.round(dfNew[\"precipitation\"], 2)\n",
+    "dfNew[\"misery index\"] = np.round(dfNew[\"misery index\"], 2)\n",
+    "print(dfNew.mean())\n",
+    "\n",
+    "def add_noise(sigma):\n",
+    "    return stats.norm.rvs(loc=0, scale=sigma, size=len(dfNew))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 326,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "image/png": "iVBORw0KGgoAAAANSUhEUgAAAXQAAAD8CAYAAABn919SAAAABHNCSVQICAgIfAhkiAAAAAlwSFlz\nAAALEgAACxIB0t1+/AAAADl0RVh0U29mdHdhcmUAbWF0cGxvdGxpYiB2ZXJzaW9uIDMuMC4xLCBo\ndHRwOi8vbWF0cGxvdGxpYi5vcmcvDW2N/gAADrlJREFUeJzt3X+MZXddxvH3Q9eKxSKVHRRpx2lJ\nWwOkSXUwKBGBglkpthgbs01qilYnIgIqBpbUBKN/uAIBSSCaFdbWiAWsKJUCUn7UBkOL29LSbkv5\nucICsluqoqCUysc/5oLT6ezee885c+fO1/crmcw9535nzpMzt0+/e+4956SqkCRtfw/Z6gCSpGFY\n6JLUCAtdkhphoUtSIyx0SWqEhS5JjbDQJakRFrokNcJCl6RG7Jjlxnbu3FlLS0uz3KQkbXs333zz\nPVW1MG7cTAt9aWmJAwcOzHKTkrTtJfnnScZ5yEWSGmGhS1IjLHRJaoSFLkmNsNAlqRFjCz3J/iRH\nktyxbv0Lktyd5GCSV2xeREnSJCaZoV8B7Fq7IsnTgAuBc6rq8cCrho8mSZrG2EKvqhuAe9etfh6w\nt6q+PhpzZBOySZKm0PUY+lnATyS5Kck/JHnikKEkSdPreqboDuAU4EnAE4G3JjmjNrjjdJIVYAVg\ncXGxa05Jc2Rpz7W9fv7Q3vMHSqK1us7QDwNvq1UfBr4J7NxoYFXtq6rlqlpeWBh7KQJJUkddC/1v\ngacDJDkLOBG4Z6hQkqTpjT3kkuQq4KnAziSHgZcD+4H9o48y3gdcutHhFknS7Iwt9Kq6+BhPXTJw\nFklSD54pKkmNsNAlqREWuiQ1wkKXpEZY6JLUCAtdkhphoUtSIyx0SWqEhS5JjbDQJakRFrokNcJC\nl6RGWOiS1AgLXZIaYaFLUiMsdElqhIUuSY0YW+hJ9ic5Mrrd3PrnfjtJJdnwBtGSpNmZZIZ+BbBr\n/cokpwHPBD47cCZJUgdjC72qbgDu3eCp1wAvAbw5tCTNgU7H0JNcAHy+qm4bOI8kqaMd0/5AkpOA\ny4GfmnD8CrACsLi4OO3mJEkT6jJDfyxwOnBbkkPAqcAtSb5/o8FVta+qlqtqeWFhoXtSSdJxTT1D\nr6rbgUd9a3lU6stVdc+AuSRJU5rkY4tXAR8Czk5yOMllmx9LkjStsTP0qrp4zPNLg6WRJHXmmaKS\n1AgLXZIaYaFLUiMsdElqhIUuSY2w0CWpERa6JDXCQpekRljoktQIC12SGmGhS1IjLHRJaoSFLkmN\nsNAlqREWuiQ1wkKXpEZY6JLUiEluQbc/yZEkd6xZ98okH0vy0SR/k+QRmxtTkjTOJDP0K4Bd69Zd\nBzyhqs4BPg68bOBckqQpjS30qroBuHfduvdU1f2jxRuBUzchmyRpCkMcQ/8l4F3HejLJSpIDSQ4c\nPXp0gM1JkjbSq9CTXA7cD7zpWGOqal9VLVfV8sLCQp/NSZKOY0fXH0xyKfBs4LyqquEiSZK66FTo\nSXYBLwV+sqq+NmwkSVIXk3xs8SrgQ8DZSQ4nuQx4HXAycF2SW5P8ySbnlCSNMXaGXlUXb7D6jZuQ\nRZLUg2eKSlIjLHRJaoSFLkmNsNAlqREWuiQ1wkKXpEZY6JLUiM6n/ktSV0t7ru38s4f2nj9gkrY4\nQ5ekRljoktQIC12SGmGhS1IjLHRJaoSFLkmNsNAlqREWuiQ1wkKXpEZMcgu6/UmOJLljzbrvTXJd\nkk+Mvp+yuTElSeNMMkO/Ati1bt0e4H1VdSbwvtGyJGkLjS30qroBuHfd6guBK0ePrwSeM3AuSdKU\nuh5D/76q+iLA6PujjjUwyUqSA0kOHD16tOPmJEnjbPqbolW1r6qWq2p5YWFhszcnSf9vdS30LyV5\nNMDo+5HhIkmSuuha6NcAl44eXwq8fZg4kqSuJvnY4lXAh4CzkxxOchmwF3hmkk8AzxwtS5K20Ng7\nFlXVxcd46ryBs0iSevBMUUlqhIUuSY2w0CWpERa6JDXCQpekRljoktQIC12SGmGhS1IjLHRJaoSF\nLkmNsNAlqREWuiQ1wkKXpEZY6JLUCAtdkhphoUtSIyx0SWpEr0JP8ptJDia5I8lVSR46VDBJ0nQ6\nF3qSxwAvBJar6gnACcDuoYJJkqbT95DLDuC7kuwATgK+0D+SJKmLsTeJPpaq+nySVwGfBf4LeE9V\nvWf9uCQrwArA4uJi181J2sDSnmu3OoLmSJ9DLqcAFwKnAz8APCzJJevHVdW+qlququWFhYXuSSVJ\nx9XnkMszgM9U1dGq+gbwNuDHh4klSZpWn0L/LPCkJCclCXAecNcwsSRJ0+pc6FV1E3A1cAtw++h3\n7RsolyRpSp3fFAWoqpcDLx8oiySpB88UlaRGWOiS1AgLXZIaYaFLUiMsdElqhIUuSY2w0CWpEb0+\nhy5Js9bngmSH9p4/YJL54wxdkhphoUtSIyx0SWqEhS5JjbDQJakRFrokNcJCl6RGWOiS1IhehZ7k\nEUmuTvKxJHcl+bGhgkmSptP3TNHXAu+uqouSnAicNEAmSVIHnQs9ycOBpwDPBaiq+4D7hoklSZpW\nn0MuZwBHgT9L8pEkb0jysIFySZKm1KfQdwA/DPxxVZ0LfBXYs35QkpUkB5IcOHr0aI/NSZKOp0+h\nHwYOV9VNo+WrWS34B6iqfVW1XFXLCwsLPTYnSTqezoVeVf8CfC7J2aNV5wF3DpJKkjS1vp9yeQHw\nptEnXD4N/GL/SJKkLnoVelXdCiwPlEWS1INnikpSIyx0SWqEhS5JjbDQJakRFrokNcJCl6RGWOiS\n1AgLXZIa0fdMUUk9Le25dqsjqBHO0CWpERa6JDXCQpekRljoktQIC12SGmGhS1IjLHRJaoSFLkmN\n6F3oSU5I8pEk7xgikCSpmyFm6C8C7hrg90iSeuhV6ElOBc4H3jBMHElSV31n6H8EvAT45gBZJEk9\ndL44V5JnA0eq6uYkTz3OuBVgBWBxcbHr5qRN5QWyNE7f18ihvecPlOTY+szQnwxckOQQ8Gbg6Un+\nYv2gqtpXVctVtbywsNBjc5Kk4+lc6FX1sqo6taqWgN3A+6vqksGSSZKm4ufQJakRg9zgoqquB64f\n4ndJkrpxhi5JjbDQJakRFrokNcJCl6RGWOiS1AgLXZIaYaFLUiMsdElqhIUuSY2w0CWpERa6JDXC\nQpekRljoktQIC12SGmGhS1IjLHRJaoSFLkmN6FzoSU5L8oEkdyU5mORFQwaTJE2nzy3o7gdeXFW3\nJDkZuDnJdVV150DZJElT6DxDr6ovVtUto8f/AdwFPGaoYJKk6QxyDD3JEnAucNMQv0+SNL0+h1wA\nSPLdwF8Dv1FVX9ng+RVgBWBxcbHv5iSps6U91251hE3Va4ae5DtYLfM3VdXbNhpTVfuqarmqlhcW\nFvpsTpJ0HH0+5RLgjcBdVfXq4SJJkrroM0N/MvALwNOT3Dr6etZAuSRJU+p8DL2qPghkwCySpB48\nU1SSGmGhS1IjLHRJaoSFLkmNsNAlqREWuiQ1wkKXpEZY6JLUiN4X55qVPhfVObT3/AGTaJyt+lu1\nfuElaRxn6JLUCAtdkhphoUtSIyx0SWqEhS5JjbDQJakRFrokNcJCl6RG9L1J9K4kdyf5ZJI9Q4WS\nJE2vz02iTwBeD/w08Djg4iSPGyqYJGk6fWboPwp8sqo+XVX3AW8GLhwmliRpWn0K/THA59YsHx6t\nkyRtgT4X58oG6+pBg5IVYGW0+J9J7u64vZ3APV1+MH/YcYvddc66BeYq6wR/q7nKO8Z2ygrbK++2\ny9qzh35wkkF9Cv0wcNqa5VOBL6wfVFX7gH09tgNAkgNVtdz398yCWTfPdsq7nbLC9spr1o31OeTy\nT8CZSU5PciKwG7hmmFiSpGl1nqFX1f1Jfh34e+AEYH9VHRwsmSRpKr1ucFFV7wTeOVCWcXoftpkh\ns26e7ZR3O2WF7ZXXrBtI1YPex5QkbUOe+i9JjZirQh93KYEk35nkLaPnb0qyNPuUD8gzLu9TktyS\n5P4kF21FxjVZxmX9rSR3JvlokvclmehjUptlgry/muT2JLcm+eBWnqU86SUwklyUpJJs2aczJtiv\nz01ydLRfb03yy1uRc02esfs2yc+PXrsHk/zlrDOuyTFu375mzX79eJJ/GzxEVc3FF6tvrH4KOAM4\nEbgNeNy6Mb8G/Mno8W7gLXOedwk4B/hz4KI5z/o04KTR4+dtg3378DWPLwDePa9ZR+NOBm4AbgSW\n5zUr8FzgdVv1t++Q90zgI8Apo+VHzWvWdeNfwOoHSQbNMU8z9EkuJXAhcOXo8dXAeUk2OsFpFsbm\nrapDVfVR4JtbEXCNSbJ+oKq+Nlq8kdXzCrbKJHm/smbxYWxwUtuMTHoJjN8HXgH89yzDrbPdLtcx\nSd5fAV5fVf8KUFVHZpzxW6bdtxcDVw0dYp4KfZJLCXx7TFXdD/w78MiZpHuw7XTpg2mzXga8a1MT\nHd9EeZM8P8mnWC3KF84o23pjsyY5Fzitqt4xy2AbmPR18HOjQ29XJzltg+dnZZK8ZwFnJfnHJDcm\n2TWzdA808X9jo8OZpwPvHzrEPBX6JJcSmOhyAzMyT1nGmThrkkuAZeCVm5ro+CbKW1Wvr6rHAi8F\nfmfTU23suFmTPAR4DfDimSU6tkn2698BS1V1DvBe/u9fxFthkrw7WD3s8lRWZ71vSPKITc61kWn6\nYDdwdVX9z9Ah5qnQJ7mUwLfHJNkBfA9w70zSPdhElz6YExNlTfIM4HLggqr6+oyybWTafftm4Dmb\nmujYxmU9GXgCcH2SQ8CTgGu26I3Rsfu1qr685m//p8CPzCjbRibthLdX1Teq6jPA3awW/KxN85rd\nzSYcbgHm6k3RHcCnWf2nyLfeVHj8ujHP54Fvir51nvOuGXsFW/um6CT79lxW39Q5c5u8Fs5c8/hn\ngAPzmnXd+OvZujdFJ9mvj17z+GeBG+f8dbALuHL0eCerhz0eOY9ZR+POBg4xOgdo8Bxb9cc6xk55\nFvDxUbFcPlr3e6zOGAEeCvwV8Engw8AZc573iaz+n/urwJeBg3Oc9b3Al4BbR1/XzPm+fS1wcJT1\nA8cr0a3Oum7slhX6hPv1D0b79bbRfv2hOX8dBHg1cCdwO7B7XrOOln8X2LtZGTxTVJIaMU/H0CVJ\nPVjoktQIC12SGmGhS1IjLHRJaoSFLkmNsNAlqREWuiQ14n8BZ0wVSA72yJ4AAAAASUVORK5CYII=\n",
+      "text/plain": [
+       "<Figure size 432x288 with 1 Axes>"
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "haunts = 0.12 + \\\n",
+    "         0.23*(dfNew[\"age\"]/156 + add_noise(0.45)) + \\\n",
+    "        -0.5 *(dfNew[\"distance cemetery\"]/5 + add_noise(0.4)) + \\\n",
+    "         0.2 *(dfNew[\"cats\"]/5 + add_noise(0.55))\n",
+    "            \n",
+    "dfNew[\"haunted\"] = haunts\n",
+    "\n",
+    "dfNew.head()\n",
+    "plt.hist(1/(1+np.exp(-dfNew[\"haunted\"])), bins=20);\n",
+    "# distance to major metro area\n",
+    "# number of bathrooms\n",
+    "# square footage\n",
+    "# nearest pet cemetery \n",
+    "# noisiness of furnace\n",
+    "# murders per capita"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 340,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "# rearrange into a slightly more reasonable order\n",
+    "feature_names = [\"age\", \"area\", \"bathrooms\", \"distance metro\", \"distance cemetery\", \"cats\", \\\n",
+    "                 \"howls\", \"clouds\", \"precipitation\", \"misery index\", \"ice cream sold\"]\n",
+    "dfNew = dfNew[feature_names + ['haunted']]\n",
+    "dfNew.head()\n",
+    "dfNew.to_csv(\"./data/houses_SPRING2019.csv\", index=False)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<br>\n",
+    "\n",
+    "---\n",
+    "[Back to top](#top)\n",
+    "<a id='bot'></a>"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.6.5"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}
